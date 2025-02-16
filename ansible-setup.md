@@ -1,4 +1,163 @@
 
+**1. System Preparation**
+
+   - **Update Package Manager**
+
+     For Amazon Linux systems:
+
+     ```bash
+     sudo yum update -y
+     ```
+
+     For systems using DNF (e.g., Fedora):
+
+     ```bash
+     sudo dnf update -y
+     ```
+
+   - **Install Package Management Utilities**
+
+     For Amazon Linux:
+
+     ```bash
+     sudo yum install -y amazon-linux-extras
+     ```
+
+     For DNF-based systems:
+
+     ```bash
+     sudo dnf install -y python3 python3-pip
+     ```
+
+**2. Ansible Installation**
+
+   - **Using Amazon Linux Extras**
+
+     ```bash
+     sudo amazon-linux-extras install ansible2 -y
+     ```
+
+   - **Using Pip (Python Package Installer)**
+
+     ```bash
+     pip3 install --user ansible
+     ```
+
+     Ensure that the local bin directory is in your system's PATH:
+
+     ```bash
+     echo 'export PATH=$PATH:~/.local/bin/' >> ~/.bashrc
+     source ~/.bashrc
+     ```
+
+   - **Verify Ansible Installation**
+
+     ```bash
+     ansible --version
+     ```
+
+**3. Configure SSH for Passwordless Authentication**
+
+   - **Generate SSH Key Pair**
+
+     ```bash
+     ssh-keygen -t rsa -b 2048
+     ```
+
+     Press Enter to accept the default file location and leave the passphrase empty for passwordless authentication.
+
+   - **Copy Public Key to Target Hosts**
+
+     ```bash
+     ssh-copy-id username@target_host_ip
+     ```
+
+     Replace `username` and `target_host_ip` with the appropriate values.
+
+**4. Set Up Ansible Inventory**
+
+   - **Create Inventory Directory and File**
+
+     ```bash
+     sudo mkdir -p /etc/ansible
+     sudo vi /etc/ansible/hosts
+     ```
+
+     In the hosts file, define your groups and hosts:
+
+     ```ini
+     [webservers]
+     192.168.1.10
+     192.168.1.11
+
+     [databases]
+     192.168.1.20
+     ```
+
+**5. Test Connectivity**
+
+   - **Ping All Hosts**
+
+     ```bash
+     ansible all -m ping
+     ```
+
+     A successful response will return "pong" from each host.
+
+**6. Execute Ad-Hoc Commands**
+
+   - **Check Uptime on All Hosts**
+
+     ```bash
+     ansible all -m shell -a "uptime"
+     ```
+
+   - **Install Nginx on All Hosts**
+
+     ```bash
+     ansible all -m apt -a "name=nginx state=present" --become
+     ```
+
+     Note: Adjust the package manager module (`apt`, `yum`, etc.) based on your system.
+
+**7. Run Ansible Playbooks**
+
+   - **Create a Playbook Directory and File**
+
+     ```bash
+     mkdir -p ~/playbooks
+     vi ~/playbooks/example.yml
+     ```
+
+     Example playbook content:
+
+     ```yaml
+     ---
+     - name: Install and start Nginx
+       hosts: webservers
+       become: yes
+       tasks:
+         - name: Install Nginx
+           apt:
+             name: nginx
+             state: present
+         - name: Start Nginx service
+           service:
+             name: nginx
+             state: started
+     ```
+
+   - **Run the Playbook**
+
+     ```bash
+     ansible-playbook ~/playbooks/example.yml
+     ```
+
+
+ 
+
+Part 2 
+
 1. **Setting Up Passwordless SSH Authentication Using `ssh-copy-id`:**
 
    ```bash
